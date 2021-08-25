@@ -1,7 +1,7 @@
 package picrew
 
 import (
-	"cs/img"
+	"github.com/tdf1939/img"
 	"fmt"
 	"image/color"
 	"math/rand"
