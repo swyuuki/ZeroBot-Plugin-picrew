@@ -1,4 +1,4 @@
-module cs
+module github.com/tdf1939/ZeroBot-Plugin-picrew
 
 go 1.16
 
