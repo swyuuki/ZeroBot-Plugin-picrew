@@ -54,17 +54,15 @@ func ToPic1() string {
 		"背景２",
 	}
 	//必须组件
-	Main.SetIm(Pic1, PNm, "", 1)
+	Main.SetIm(Pic1, PNm, -1, 1)
 	//头发
-	hcolall := Pic1[Hair0[0]].Cols
-	li := rand.Intn(len(hcolall))
-	hcol := hcolall[li]
+	hcol := rand.Intn(Pic0[Hair0[0]].Cols)
 	Main.SetIm(Pic1, Hair0, hcol, 1)
 	Main.SetIm(Pic1, Hair1, hcol, 3)
 	Main.SetIm(Pic1, Hair2, hcol, 4)
 
-	Main.SetIm(Pic1, PNm2, "", 3)
-	Main.SetIm(Pic1, PNm3, "", 3)
+	Main.SetIm(Pic1, PNm2, -1, 3)
+	Main.SetIm(Pic1, PNm3, -1, 3)
 	// 制图
 	return Main.Save(45)
 }

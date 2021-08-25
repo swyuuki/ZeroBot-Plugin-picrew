@@ -1,7 +1,7 @@
 package picrew
 
 import (
-	"github.com/tdf1939/img"
+	"cs/img"
 	"fmt"
 	"image/color"
 	"math/rand"
@@ -21,13 +21,13 @@ type Im struct {
 	Url string //地址
 }
 
-//素材切片
-type UrlsMap []map[string]Im
+//素材全部图层切片
+type Urls [][]Im
 
 //部件结构体
 type ItemsMap struct {
-	Items []UrlsMap //插件
-	Cols  []string  //颜色
+	Items []Urls //插件
+	Cols  int    //颜色数
 }
 
 //项目字典
@@ -52,22 +52,25 @@ func SetCf(id string) Main {
 		for _, v1 := range lyrsAll {
 			lyrs = append(lyrs, v1.String())
 		}
-		ColAll := gjson.Get(cfjson, "cpList."+gjson.Get(pList, "cpId").String()).Array()
+		cpId := gjson.Get(pList, "cpId").String()
+		ColAll := gjson.Get(cfjson, "cpList."+cpId).Array()
+		li.Cols = len(ColAll)
+		var cIds []string //部件颜色id
 		for _, v1 := range ColAll {
-			li.Cols = append(li.Cols, gjson.Get(v1.String(), "cId").String())
+			cIds = append(cIds, gjson.Get(v1.String(), "cId").String())
 		}
 		itemsAll := gjson.Get(pList, `items`).Array()
 		for _, v1 := range itemsAll {
 			item := gjson.Get(v1.String(), `itmId`).String()
 			urls := gjson.Get(imgjson, `lst.`+item).String()
-			var k UrlsMap
+			var k Urls
 			for _, v2 := range lyrs {
 				tc := int(gjson.Get(cfjson, `lyrList.`+v2).Int()) //图层数
-				t := make(map[string]Im)
+				var t []Im                                        //素材单个图层地址切片
 				if lyrurl := gjson.Get(urls, v2).String(); gjson.Get(urls, v2).Exists() {
-					for _, v3 := range li.Cols {
+					for _, v3 := range cIds {
 						if colurl := gjson.Get(lyrurl, v3+".url").String(); gjson.Get(lyrurl, v3).Exists() {
-							t[v3] = Im{Lyr: tc, Url: colurl}
+							t = append(t, Im{Lyr: tc, Url: colurl})
 						}
 					}
 					k = append(k, t)
@@ -81,24 +84,18 @@ func SetCf(id string) Main {
 }
 
 //选择部件对应素材, nm 部件列表, col指定颜色小于0则随机，r  1/r概率选择此部件
-func (ims ImsMap) SetIm(m Main, nm []string, col string, r int) {
+func (ims ImsMap) SetIm(m Main, nm []string, col int, r int) {
 	rand.Seed(time.Now().UnixNano())
-	rcol := "1"
-	if col != "" {
-		rcol = col
-	}
 	for _, v := range nm {
-		it := m[v].Items[rand.Intn(len(m[v].Items))]
-		for _, v1 := range it {
-			if url, ok := v1[rcol]; ok {
-				ims[url.Lyr] = `https://cdn.picrew.me` + url.Url
-			} else {
-				var cols []string
-				for col := range v1 {
-					cols = append(cols, col)
+		if rr := rand.Intn(r); rr == 0 {
+			it := m[v].Items[rand.Intn(len(m[v].Items))]
+			for _, v1 := range it {
+				if col <= len(v1) && col >= 0 {
+					ims[v1[col].Lyr] = `https://cdn.picrew.me` + v1[col].Url
+				} else {
+					col := rand.Intn(len(v1))
+					ims[v1[col].Lyr] = `https://cdn.picrew.me` + v1[col].Url
 				}
-				url2 := v1[cols[rand.Intn(len(cols))]]
-				ims[url2.Lyr] = `https://cdn.picrew.me` + url2.Url
 			}
 		}
 	}
@@ -114,7 +111,7 @@ func (m ImsMap) Save(r int) string {
 	dc := img.NewDc(600, 600, color.NRGBA{0, 0, 0, 0})
 	for i := 1; i <= r; i++ {
 		if v, ok := m[i]; ok {
-// 			req.SetProxyUrl("http://127.0.0.1:10809") 代理
+			req.SetProxyUrl("http://127.0.0.1:10809")
 			re, _ := req.Get(v)
 			re.ToFile(path + strconv.Itoa(i) + ".png")
 			dc.Over(img.ImDc(path+strconv.Itoa(i)+".png", 0, 0).Im, 0, 0, 0, 0)
