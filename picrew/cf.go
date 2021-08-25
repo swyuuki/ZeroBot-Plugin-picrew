@@ -111,7 +111,7 @@ func (m ImsMap) Save(r int) string {
 	dc := img.NewDc(600, 600, color.NRGBA{0, 0, 0, 0})
 	for i := 1; i <= r; i++ {
 		if v, ok := m[i]; ok {
-			req.SetProxyUrl("http://127.0.0.1:10809")
+// 			req.SetProxyUrl("http://127.0.0.1:10809")   //代理，按需设置
 			re, _ := req.Get(v)
 			re.ToFile(path + strconv.Itoa(i) + ".png")
 			dc.Over(img.ImDc(path+strconv.Itoa(i)+".png", 0, 0).Im, 0, 0, 0, 0)
