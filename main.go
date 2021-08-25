@@ -6,9 +6,14 @@ import (
 )
 
 func main() {
-	// for i, v := range picrew.Pic0["前髪"].Items[0][0] {
-	// 	fmt.Print(i, ". ", v, " \n")
-	// }
+		var url string
+		if rand.Intn(3) == 0 {
+			url = picrew.ToPic0()
+		} else if rand.Intn(2) == 0 {
+			url = picrew.ToPic1()
+		} else {
+			url = picrew.ToPic2()
+		}
 
-	fmt.Print(picrew.ToPic2())
+	fmt.Print(url)
 }
