@@ -118,7 +118,7 @@ func (m ImsMap) Save(r int) string {
 			re, _ := req.Get(v)
 			re.ToFile(path + strconv.Itoa(i) + ".png")
 			dc.Over(img.ImDc(path+strconv.Itoa(i)+".png", 0, 0).Im, 0, 0, 0, 0)
-			fmt.Print("已成功", i, "张；还剩", r-i, "张！\n")
+			fmt.Print(f, ": 已成功", i, "张；还剩", r-i, "张！\n")
 		}
 	}
 	img.SavePng(dc.Im, path+"pic.png")
